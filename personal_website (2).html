@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Blue Infinity Pyramid</title>
+    <style>
+        :root {
+            --bg-color: #050a14;
+            --grid-color: rgba(0, 150, 255, 0.1);
+            --accent-blue: #0077ff;
+            --text-blue: #a0c4ff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background-color: var(--bg-color);
+            /* Engineering Grid Background */
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-blue);
+            margin: 0; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+        
+        h2 { 
+            margin-top: 20px; 
+            color: white; 
+            text-transform: uppercase; 
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        #game-container {
+            width: 100%;
+            height: 75vh;
+            display: flex;
+            flex-direction: column-reverse; 
+            align-items: center;
+            overflow-y: auto;
+            perspective: 1200px;
+            padding-bottom: 50px;
+            scrollbar-width: none;
+        }
+        #game-container::-webkit-scrollbar { display: none; }
+
+        .work-block {
+            height: 45px;
+            margin: 2px 0;
+            color: white;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: rotateX(30deg);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            animation: build-up 0.4s ease-out;
+        }
+
+        @keyframes build-up {
+            from { transform: scale(0.5) translateZ(-100px) rotateX(30deg); opacity: 0; }
+            to { transform: scale(1) translateZ(0) rotateX(30deg); opacity: 1; }
+        }
+
+        .input-zone { 
+            position: fixed; 
+            bottom: 40px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input { 
+            padding: 15px 25px; 
+            border-radius: 30px; 
+            border: 2px solid var(--accent-blue); 
+            width: 350px; 
+            background: rgba(10, 25, 50, 0.8); 
+            color: white; 
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            box-shadow: 0 0 15px var(--accent-blue);
+        }
+
+        input::placeholder { color: #4a6fa5; }
+
+        .hint { font-size: 11px; color: #4a6fa5; }
+
+        button.clear { 
+            background: transparent; 
+            color: #ff4d4d; 
+            border: 1px solid #ff4d4d; 
+            padding: 5px 15px; 
+            border-radius: 5px; 
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button.clear:hover { background: rgba(255, 77, 77, 0.1); }
+    </style>
+</head>
+<body>
+
+    <h2>Structural Work Pyramid</h2>
+    
+    
+
+    <div id="game-container" id="display-area"></div>
+
+    <div class="input-zone">
+        <input type="text" id="work-input" placeholder="TYPE TASK & PRESS ENTER" onkeydown="if(event.key==='Enter') addBlock()">
+        <span class="hint">Continuous Input Enabled</span>
+        <button class="clear" onclick="clearStack()">COLLAPSE ALL</button>
+    </div>
+
+    <script>
+        let blockCount = 0;
+        const initialWidth = 550;
+        const scaleFactor = 0.94; // Sharper pyramid angle
+        const minWidth = 60;
+
+        function addBlock() {
+            const input = document.getElementById('work-input');
+            const container = document.getElementById('game-container');
+            
+            if (input.value.trim() === "") return;
+
+            let currentWidth = initialWidth * Math.pow(scaleFactor, blockCount);
+            if (currentWidth < minWidth) currentWidth = minWidth;
+
+            const block = document.createElement('div');
+            block.className = 'work-block';
+            block.innerText = input.value.toUpperCase();
+            block.style.width = currentWidth + "px";
+
+            // Blue Gradient Theme based on height
+            // Lightens as it goes up
+            const lightness = Math.min(20 + (blockCount * 2), 70);
+            block.style.backgroundColor = `hsl(210, 80%, ${lightness}%)`;
+            block.style.borderBottom = `6px solid hsl(210, 80%, ${lightness - 15}%)`;
+
+            container.appendChild(block);
+            
+            blockCount++;
+            container.scrollTo({ top: 0, behavior: 'smooth' });
+            input.value = "";
+        }
+
+        function clearStack() {
+            document.getElementById('game-container').innerHTML = "";
+            blockCount = 0;
+        }
+    </script>
+</body>
+</html>
